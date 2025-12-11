@@ -1,11 +1,11 @@
 import React from "react";
 import { motion } from "motion/react";
-import { Button } from "@mantine/core";
+import { Button , Loader} from "@mantine/core";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../../redux/slice/authSlice";
+import { registerUser } from "../redux/slice/authSlice.js";
 import { Link } from "react-router-dom";
 
 // const registerSchema = z.object({
