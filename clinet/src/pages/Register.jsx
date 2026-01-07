@@ -1,32 +1,62 @@
 import React from "react";
 import { motion } from "motion/react";
-import { Button , Loader} from "@mantine/core";
+import { Button, Loader } from "@mantine/core";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useDispatch, useSelector } from "react-redux";
-import { registerUser } from "../redux/slice/authSlice.js";
-import { Link } from "react-router-dom";
+import { data, Link } from "react-router-dom";
 
-// const registerSchema = z.object({
-//   email:z
-//   .string()
-//   .min({message:"this is has to be email"})
-//   .email('this is valid email'),
-//   password : z
-//   .string()
-// })
+const passwordSchema = z
+  .string()
+  .min(8, { message: "Password should be at least 8 character long" })
+  .superRefine((value, ctx) => {
+    console.log(value);
+    if (!/[A-Z]/.test(value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Must required at least one uppercase case",
+      });
+    }
+    if (!/[a-z]/.test(value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Must required at least one lowercase case",
+      });
+    }
+    if (!/[0-9]/.test(value)) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "Must required at least one digit",
+      });
+    }
+  });
 
+const registerSchema = z
+  .object({
+    name: z
+      .string()
+      .min(1, { message: "name should contain to be at least 1 charater" }),
+    email: z
+      .string()
+      .min(4, { message: "this is has to be email" })
+      .email("this is valid email"),
+    password: passwordSchema,
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    message: "password do not match",
+    path: ["confirmPassword"],
+  });
 function Register() {
-  const dispatch = useDispatch();
-
-  const { loading } = useSelector((state) => state.auth);
-
-  const { register, handleSubmit } = useForm({
-    // resolver:zodResolver(registerSchema)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    resolver: zodResolver(registerSchema),
   });
   const onSubmit = (data) => {
-    dispatch(registerUser(data));
     console.log(data);
   };
 
@@ -41,45 +71,59 @@ function Register() {
         <h1 className="text-2xl font-bold mb-4">Sing Up</h1>
         <form className="space-y-6 w-full" onSubmit={handleSubmit(onSubmit)}>
           <div className="flex gap-2">
-
             <input
               type="text"
-              placeholder="Enter Email..."
+              name="name"
+              placeholder="Enter Name..."
               className="focus:outline-none border-b w-full border-gray-200 "
               {...register("name")}
             />
+            {errors.name && (
+              <p className="text-red-500">{errors.name.message} </p>
+            )}
           </div>
 
           <div className="flex gap-2">
-
             <input
               type="email"
+              name="email"
               placeholder="Enter Email..."
               className="focus:outline-none border-b w-full border-gray-200 "
               {...register("email")}
             />
-            {/* {errors.email && <p> {errors.email.message} </p>} */}
+            {errors.email && (
+              <p className="text-red-500"> {errors.email.message} </p>
+            )}
           </div>
 
           <div className="flex gap-2">
             <input
               type="password"
+              name="password"
               placeholder="Enter Pass..."
               className="focus:outline-none border-b w-full border-gray-200"
               {...register("password")}
             />
+            {errors.password && <p className="test-sm text-red-500">
+              {errors.password.message}
+              </p>}
           </div>
           <div className="flex gap-2">
             <input
               type="password"
+              name="confirmPassword"
               placeholder="confram Pass..."
               className="focus:outline-none border-b w-full border-gray-200"
-              {...register("conframPassword")}
+              {...register("confirmPassword")}
             />
+            {errors.confirmPassword && (
+              <p className="text-red-500">{errors.confirmPassword.message} </p>
+            )}
           </div>
 
-          <Button type="submit" color="#6f6af8" >
-            {loading ? <Loader size={20} color="white" /> : "Register"}
+          <Button type="submit" color="#6f6af8">
+            Register
+            {/* {loading ? <Loader size={20} color="white" /> : "Register"} */}
           </Button>
           <p className=" text-gray-800">
             Already have an account?

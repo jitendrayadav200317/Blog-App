@@ -4,7 +4,7 @@ import bcrypt from "bcrypt";
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    const { email, password, name } = req.body;
     const user = await User.findOne({ email });
     if (!user) {
       return res.status(404).json({
@@ -17,14 +17,14 @@ export const login = async (req, res) => {
         message: "password is not match",
       });
     }
-    const token = jwt.sign({ is: user._id, name: user.name }, "this-is-strng", {
+    const token = jwt.sign({ id: user._id, name: user.name,user:user.email }, "this-is-strng", {
       expiresIn: "1d",
     });
-    res.cookis("coolie",{
+    res.cookie("token",token,{
       httpOnly:true,
     });
     res.status(200).json({
-      message:"login message",
+      message:"login successfull",
     })
   } catch (error) {
     return res.status(500).json({
@@ -38,27 +38,24 @@ export const register = async (req, res) => {
   try {
     const { name, password, email } = req.body; //fatch data
 
-    if ((!email, !password, !name)) {
-      return res.status(400).json({
-        message: "please the file",
-      });
-    }
     const user = await User.findOne({ email }); // check if user is already register
     if (user) {
       return res.status(404).json({
         message: "User is already register plase login",
       });
     }
-    const hashedPasword = await bcrypt.hash(password, 12);
+    const hashedPasword = await bcrypt.hash(password, 12); // password hashed
+
     const newUser = await User.create({ name, password: hashedPasword, email }); //register newUser
     res.status(201).json({
       data: newUser,
       massage: "successfully register",
     });
   } catch (error) {
-    return res.status(500).json({
-      message: "save error",
-      error: message.error,
-    });
-  }
+  return res.status(500).json({
+    message: "server error",
+    error: error.message,
+  });
+}
+
 };

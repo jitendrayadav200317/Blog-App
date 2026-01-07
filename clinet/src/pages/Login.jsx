@@ -10,8 +10,8 @@ const loginSchema = z.object({
   email: z
     .string()
     .min(1, { message: "this is has to be valid email" })
-    .email("this is valid email.."),
-  password: z.string(),
+    .email('this is valid email..'),
+  password: z.string().min(1,{message:"password is required"}),
 });
 function Login() {
   const {
@@ -43,7 +43,9 @@ function Login() {
               className="focus:outline-none border-b w-full border-gray-300"
               {...register("email")}
             />
-            {errors.email && <P>{errors.email.message}</P>}
+            {errors.email && (
+              <p className="text-red-500">{errors.email.message}</p>
+            )}
           </div>
 
           <div className="flex gap-2">
@@ -53,9 +55,14 @@ function Login() {
               className="focus:outline-none border-b w-full border-gray-300"
               {...register("password")}
             />
+            {errors.password && (
+              <p className="text-red-500 ">{errors.password.message}</p>
+            )}
           </div>
 
-          <Button type="submit" color="#6f6af8">login</Button>
+          <Button type="submit" color="#6f6af8">
+            login
+          </Button>
 
           <p className="   text-gray-800">
             Don't have an account?
@@ -67,7 +74,6 @@ function Login() {
       </motion.div>
     </div>
   );
-  
 }
 
 export default Login;
