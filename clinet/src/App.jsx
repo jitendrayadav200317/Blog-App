@@ -1,11 +1,12 @@
 import React from "react";
 import "@mantine/core/styles.css";
 import { Routes, Route } from "react-router-dom";
-import { Toaster } from 'sonner'
+import { Toaster } from "sonner";
 
 import Navbar from "./components/Navbar.jsx";
 import Login from "./pages/Login.jsx";
 import Register from "./pages/Register.jsx";
+import HeroSection from "./components/HeroSection.jsx";
 
 function App() {
   return (
@@ -15,6 +16,7 @@ function App() {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/Register" element={<Register />} />
+        <Route path="/" element={<HeroSection />} />
       </Routes>
     </div>
   );
